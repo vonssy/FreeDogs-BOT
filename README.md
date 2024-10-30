@@ -40,33 +40,33 @@ Pastikan Anda telah menginstal Python3.9 dan PIP.
 
 ### How To Get FreeDogs Query
 
-    Kamu dapat copy dan paste kode berikut di console pada DevTools untuk memperoleh query yang dibutuhkan, jangan lupa `allow pasting` dahulu jika pertama kali menggunakan console.
+  Kamu dapat copy dan paste kode berikut di console pada DevTools untuk memperoleh query yang dibutuhkan, jangan lupa `allow pasting` dahulu jika pertama kali menggunakan console.
 
-    ```bash
-    let value = sessionStorage.getItem('telegram-apps/launch-params');
-    value = value.replace(/^"|"$/g, '');
+  ```bash
+  let value = sessionStorage.getItem('telegram-apps/launch-params');
+  value = value.replace(/^"|"$/g, '');
 
-    let tgWebAppDataStart = value.indexOf('query_id%3D');
+  let tgWebAppDataStart = value.indexOf('query_id%3D');
 
-    if (tgWebAppDataStart === -1) {
-    tgWebAppDataStart = value.indexOf('user%3D');
-    }
+  if (tgWebAppDataStart === -1) {
+  tgWebAppDataStart = value.indexOf('user%3D');
+  }
 
-    if (tgWebAppDataStart !== -1) {
-    let tgWebAppData = value.substring(tgWebAppDataStart);
-    let ampersandPos = tgWebAppData.indexOf('&');
+  if (tgWebAppDataStart !== -1) {
+  let tgWebAppData = value.substring(tgWebAppDataStart);
+  let ampersandPos = tgWebAppData.indexOf('&');
 
-    if (ampersandPos !== -1) {
-        tgWebAppData = tgWebAppData.substring(0, ampersandPos);
-    }
+  if (ampersandPos !== -1) {
+      tgWebAppData = tgWebAppData.substring(0, ampersandPos);
+  }
 
-    copy(tgWebAppData)
+  copy(tgWebAppData)
 
-    console.log('Sukses menyalin query');
-    } else {
-    console.log('Query tidak ditemukan.');
-    }
-    ```
+  console.log('Sukses menyalin query');
+  } else {
+  console.log('Query tidak ditemukan.');
+  }
+  ```
 
 ## Jalankan
 
