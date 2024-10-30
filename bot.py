@@ -396,7 +396,7 @@ class FreeDOGS:
                         self.process_query(query)
                         self.log(f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"*75)
 
-                seconds = 60
+                seconds = 180
                 while seconds > 0:
                     formatted_time = self.format_seconds(seconds)
                     print(
