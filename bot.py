@@ -135,7 +135,7 @@ class FreeDOGS:
         
         if account and "token" in account:
             token = account["token"]
-            if not self.mine_info(token):
+            if not self.game_info(token):
                 print(
                     f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
@@ -204,23 +204,6 @@ class FreeDOGS:
                 return result['data']['token']
             else:
                 return None
-        else:
-            return None
-        
-    def mine_info(self, token: str):
-        url = 'https://api.freedogs.bot/miniapps/api/mine/getMineInfo?'
-        self.headers.update({
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        })
-
-        response = self.session.get(url, headers=self.headers, allow_redirects=True)
-        if response.status_code == 200:
-            result = response.json()
-            if result['code'] == 0:
-                return result['data']
-            else:
-                return False
         else:
             return None
         
@@ -317,53 +300,51 @@ class FreeDOGS:
         if exist_account and "token" in exist_account:
             token = exist_account["token"]
 
-            mine_info = self.mine_info(token)
-            if not mine_info:
+            game = self.game_info(token)
+            if not game:
                 self.renew_token(account_name)
                 tokens_data = self.load_tokens()
                 new_account = next((acc for acc in tokens_data["accounts"] if acc["first_name"] == account_name), None)
                 
                 if new_account and "token" in new_account:
                     new_token = new_account["token"] 
-                    mine_info = self.mine_info(new_token)
+                    game = self.game_info(new_token)
 
-            if mine_info:
+            if game:
                 self.log(
                     f"{Fore.MAGENTA + Style.BRIGHT}[ Account{Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                     f"{Fore.MAGENTA + Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {mine_info['getCoin']} $FREEDOG {Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {game['currentAmount']} $FREEDOG {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                 )
+                time.sleep(1)
 
-                game = self.game_info(new_token if 'new_token' in locals() else token)
-                if game:
-                    max_click = game['userToDayMaxClick']
-                    today_click = game['userToDayNowClick']
-                    amount = int(game['coinPoolLeft'])
-                    seq_no = int(game['collectSeqNo'])
-                    hash_code = self.generate_hash(amount, seq_no)
+                max_click = game['userToDayMaxClick']
+                today_click = game['userToDayNowClick']
+                amount = int(game['coinPoolLeft'])
+                seq_no = int(game['collectSeqNo'])
+                hash_code = self.generate_hash(amount, seq_no)
 
-                    if today_click < max_click:
-                        collect = self.collect_coin(new_token if 'new_token' in locals() else token, amount, hash_code, seq_no)
-                        if collect:
-                            self.log(
-                                f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
-                                f"{Fore.GREEN+Style.BRIGHT} Is Success {Style.RESET_ALL}"
-                                f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
-                                f"{Fore.WHITE+Style.BRIGHT} {collect['collectAmount']} $FREEDOG {Style.RESET_ALL}"
-                                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-                            )
-                        else:
-                            self.log(
-                                f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
-                                f"{Fore.RED+Style.BRIGHT} Isn't Success {Style.RESET_ALL}"
-                                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
-                            )
+                if today_click < max_click:
+                    collect = self.collect_coin(new_token if 'new_token' in locals() else token, amount, hash_code, seq_no)
+                    if collect:
+                        self.log(
+                            f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
+                            f"{Fore.GREEN+Style.BRIGHT} Is Success {Style.RESET_ALL}"
+                            f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
+                            f"{Fore.WHITE+Style.BRIGHT} {collect['collectAmount']} $FREEDOG {Style.RESET_ALL}"
+                            f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                        )
                     else:
-                        self.log(f"{Fore.YELLOW + Style.BRIGHT}[ Tap Tap Reached Maximum Limit ]{Style.RESET_ALL}")
+                        self.log(
+                            f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
+                            f"{Fore.RED+Style.BRIGHT} Isn't Success {Style.RESET_ALL}"
+                            f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                        )
                 else:
-                    self.log(f"{Fore.RED+Style.BRIGHT}[ Error Fetching Game Info ]{Style.RESET_ALL}")
+                    self.log(f"{Fore.YELLOW + Style.BRIGHT}[ Tap Tap Reached Maximum Limit ]{Style.RESET_ALL}")
+                time.sleep(1)
 
                 tasks = self.tasks_list(new_token if 'new_token' in locals() else token)
                 if tasks:
@@ -389,6 +370,7 @@ class FreeDOGS:
                                     f"{Fore.RED+Style.BRIGHT}Isn't Completed{Style.RESET_ALL}"
                                     f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
                                 )
+                            time.sleep(1)
                 else:
                     self.log(
                         f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
