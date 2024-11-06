@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import urllib.parse
+from urllib.parse import parse_qs, unquote
 import hashlib
 from colorama import *
 from datetime import datetime
@@ -53,14 +53,13 @@ class FreeDOGS:
         return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
     def extract_user_data(self, query: str) -> str:
-        user_data_encoded = query.split('user%3D')[1].split('%26')[0]
+        parsed_query = parse_qs(unquote(query))
+        user_data = parsed_query.get('user', [None])[0]
 
-        if user_data_encoded:
-            user_data = urllib.parse.unquote(urllib.parse.unquote(user_data_encoded))
-            user_json = json.loads(user_data)
+        if user_data:
+            user_json = json.loads(unquote(user_data))
             return str(user_json.get('first_name', 'Unknown'))
         return 'Unknown'
-
 
     def load_tokens(self):
         try:
@@ -109,7 +108,7 @@ class FreeDOGS:
                         f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                         f"{Fore.GREEN + Style.BRIGHT} Successfully Generated Token {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                     "
                     )
                     accounts.insert(idx, {"first_name": account_name, "token": token})
                 else:
@@ -118,7 +117,9 @@ class FreeDOGS:
                         f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                         f"{Fore.RED + Style.BRIGHT} Failed to Generate Token {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}] [ Reason{Style.RESET_ALL}"
+                        f"{Fore.WHITE + Style.BRIGHT} Query ID Is May Expired {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}"
                     )
 
                 time.sleep(1)
@@ -160,7 +161,7 @@ class FreeDOGS:
                             f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                             f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                             f"{Fore.GREEN + Style.BRIGHT} Successfully Generated Token {Style.RESET_ALL}"
-                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                      "
                         )
                     else:
                         self.log(
@@ -168,7 +169,9 @@ class FreeDOGS:
                             f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                             f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                             f"{Fore.RED + Style.BRIGHT} Failed to Generate Token {Style.RESET_ALL}"
-                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                            f"{Fore.MAGENTA + Style.BRIGHT}] [ Reason{Style.RESET_ALL}"
+                            f"{Fore.WHITE + Style.BRIGHT} Query ID Is May Expired {Style.RESET_ALL}"
+                            f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}"
                         )
                 else:
                     self.log(
@@ -176,7 +179,7 @@ class FreeDOGS:
                         f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                         f"{Fore.MAGENTA + Style.BRIGHT}] [{Style.RESET_ALL}"
                         f"{Fore.YELLOW + Style.BRIGHT} Query Is None. Skipping {Style.RESET_ALL}"
-                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                           "
+                        f"{Fore.MAGENTA + Style.BRIGHT}]{Style.RESET_ALL}                       "
                     )
 
                 time.sleep(1)
@@ -195,10 +198,12 @@ class FreeDOGS:
         })
 
         response = self.session.post(url, headers=self.headers, data=data, allow_redirects=True)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result['data']['token']
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result['data']['token']
+            else:
+                return None
         else:
             return None
         
@@ -210,12 +215,14 @@ class FreeDOGS:
         })
 
         response = self.session.get(url, headers=self.headers, allow_redirects=True)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result['data']
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result['data']
+            else:
+                return False
         else:
-            return False
+            return None
         
     def game_info(self, token: str):
         url = 'https://api.freedogs.bot/miniapps/api/user_game_level/GetGameInfo?'
@@ -225,10 +232,12 @@ class FreeDOGS:
         })
 
         response = self.session.get(url, headers=self.headers, allow_redirects=True)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result['data']
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result['data']
+            else:
+                return False
         else:
             return None
     
@@ -246,10 +255,12 @@ class FreeDOGS:
         })
 
         response = self.session.post(url, headers=self.headers, data=data, allow_redirects=True)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result['data']
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result['data']
+            else:
+                return False
         else:
             return None
         
@@ -261,10 +272,12 @@ class FreeDOGS:
         })
 
         response = self.session.get(url, headers=self.headers, allow_redirects=True)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result['data']['lists']
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result['data']['lists']
+            else:
+                return None
         else:
             return None
         
@@ -277,20 +290,29 @@ class FreeDOGS:
         })
 
         response = self.session.post(url, headers=self.headers, data=data)
-        response.raise_for_status()
-        result = response.json()
-        if result['code'] == 0:
-            return result
+        if response.status_code == 200:
+            result = response.json()
+            if result['code'] == 0:
+                return result
+            else:
+                return None
         else:
             return None
     
     def process_query(self, query: str):
         account_name = self.extract_user_data(query)
-    
         tokens_data = self.load_tokens()
         accounts = tokens_data.get("accounts", [])
 
         exist_account = next((acc for acc in accounts if acc["first_name"] == account_name), None)
+        if not exist_account:
+            self.log(
+                f"{Fore.MAGENTA + Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
+                f"{Fore.RED + Style.BRIGHT}Token Not Found in tokens.json{Style.RESET_ALL}"
+                f"{Fore.MAGENTA + Style.BRIGHT} ]{Style.RESET_ALL}"
+            )
+            return
         
         if exist_account and "token" in exist_account:
             token = exist_account["token"]
@@ -307,9 +329,9 @@ class FreeDOGS:
 
             if mine_info:
                 self.log(
-                    f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {account_name} {Style.RESET_ALL}"
-                    f"{Fore.MAGENTA+Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
+                    f"{Fore.MAGENTA + Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                    f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
+                    f"{Fore.MAGENTA + Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT} {mine_info['getCoin']} {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                 )
@@ -395,8 +417,9 @@ class FreeDOGS:
                     if query:
                         self.process_query(query)
                         self.log(f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"*75)
+                        time.sleep(3)
 
-                seconds = 180
+                seconds = 60
                 while seconds > 0:
                     formatted_time = self.format_seconds(seconds)
                     print(
