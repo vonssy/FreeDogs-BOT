@@ -332,7 +332,7 @@ class FreeDOGS:
                     f"{Fore.MAGENTA + Style.BRIGHT}[ Account{Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT} {account_name} {Style.RESET_ALL}"
                     f"{Fore.MAGENTA + Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {mine_info['getCoin']} {Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {mine_info['getCoin']} $FREEDOG {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                 )
 
@@ -351,7 +351,7 @@ class FreeDOGS:
                                 f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
                                 f"{Fore.GREEN+Style.BRIGHT} Is Success {Style.RESET_ALL}"
                                 f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
-                                f"{Fore.WHITE+Style.BRIGHT} {collect['collectAmount']} {Style.RESET_ALL}"
+                                f"{Fore.WHITE+Style.BRIGHT} {collect['collectAmount']} $FREEDOG {Style.RESET_ALL}"
                                 f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                             )
                         else:
@@ -379,7 +379,7 @@ class FreeDOGS:
                                     f"{Fore.WHITE+Style.BRIGHT} {task['name']} {Style.RESET_ALL}"
                                     f"{Fore.GREEN+Style.BRIGHT} is Completed {Style.RESET_ALL}"
                                     f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
-                                    f"{Fore.WHITE+Style.BRIGHT} {task['rewardParty']} {Style.RESET_ALL}"
+                                    f"{Fore.WHITE+Style.BRIGHT} {task['rewardParty']} $FREEDOG {Style.RESET_ALL}"
                                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                                 )
                             else:
