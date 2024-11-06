@@ -349,7 +349,7 @@ class FreeDOGS:
                         if collect:
                             self.log(
                                 f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
-                                f"{Fore.GREEN+Style.BRIGHT} is Completed {Style.RESET_ALL}"
+                                f"{Fore.GREEN+Style.BRIGHT} Is Success {Style.RESET_ALL}"
                                 f"{Fore.MAGENTA+Style.BRIGHT}] [ Reward{Style.RESET_ALL}"
                                 f"{Fore.WHITE+Style.BRIGHT} {collect['collectAmount']} {Style.RESET_ALL}"
                                 f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
@@ -357,7 +357,7 @@ class FreeDOGS:
                         else:
                             self.log(
                                 f"{Fore.MAGENTA+Style.BRIGHT}[ Tap Tap{Style.RESET_ALL}"
-                                f"{Fore.RED+Style.BRIGHT} is Failed {Style.RESET_ALL}"
+                                f"{Fore.RED+Style.BRIGHT} Isn't Success {Style.RESET_ALL}"
                                 f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                             )
                     else:
@@ -366,13 +366,12 @@ class FreeDOGS:
                     self.log(f"{Fore.RED+Style.BRIGHT}[ Error Fetching Game Info ]{Style.RESET_ALL}")
 
                 tasks = self.tasks_list(new_token if 'new_token' in locals() else token)
-                completed_tasks = False
                 if tasks:
                     for task in tasks:
+                        task_id = task['id']
+                        completed = task['isFinish']
 
-                        if task['isFinish'] == 0:
-                            task_id = task['id']
-
+                        if task and completed == 0:
                             finish = self.finish_tasks(new_token if 'new_token' in locals() else token, task_id)
                             if finish:
                                 self.log(
@@ -387,16 +386,15 @@ class FreeDOGS:
                                 self.log(
                                     f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {task['name']} {Style.RESET_ALL}"
-                                    f"{Fore.RED+Style.BRIGHT} is Failed {Style.RESET_ALL}"
-                                    f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                                    f"{Fore.RED+Style.BRIGHT}Isn't Completed{Style.RESET_ALL}"
+                                    f"{Fore.MAGENTA+Style.BRIGHT} ]{Style.RESET_ALL}"
                                 )
-                        else:
-                            completed_tasks = True
-
-                    if completed_tasks:
-                        self.log(f"{Fore.YELLOW+Style.BRIGHT}[ All Available Task is Completed ]{Style.RESET_ALL}")
                 else:
-                    self.log(f"{Fore.RED+Style.BRIGHT}[ Error Fetching Tasks Info ]{Style.RESET_ALL}")
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Task{Style.RESET_ALL}"
+                        f"{Fore.RED+Style.BRIGHT} Data Is None {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
         
     def main(self):
         self.clear_terminal()
